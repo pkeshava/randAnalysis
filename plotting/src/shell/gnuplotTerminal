@@ -1,0 +1,3 @@
+#!/bin/zsh
+gnuplot -e 'set terminal png ; set output "plotting/output/png/gnuplotTerminalBinRand.png"; plot "dataIn/bin/data"' && imgcat plotting/output/png/gnuplotTerminalBinRand.png
+

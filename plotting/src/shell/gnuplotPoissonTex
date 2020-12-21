@@ -1,0 +1,22 @@
+#!/usr/local/bin/gnuplot
+# June 22, 2019
+# reference:
+# https://stackoverflow.com/questions/22360343/gnuplot-plot-boxes-next-to-each-other-of-discrete-function
+set xrange[-0.5:15.5]
+set samples 16
+set style data boxes
+set boxwidth 0.2 absolute
+set style fill solid noborder
+
+#set terminal png
+set terminal epslatex size 3.5,2.62 
+set output 'plotting/output/tex/gnuPlotExamplePoisson.tex'
+set xlabel '$x$'
+set ylabel '$y$'
+set format '$%g$'
+
+poisson(x) = lambda**x/int(x)!*exp(-lambda)
+plot for [lambda=1:5:2] '+' using ($0-(lambda-3)*0.1):(poisson($0)) title sprintf("λ = %d", lambda)
+
+
+

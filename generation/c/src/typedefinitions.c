@@ -40,7 +40,7 @@ u8* pu8GenRdmAsciiByteStream (int nBytes){
 //UPDATE LATER TO RECEIVE FILE POINTER
 void writeToFile(uc8* puc8inputBytes, int nBytes){
   FILE *write_ptr;
-  write_ptr = fopen("test.bin","wb");  // w for write, b for binary
+  write_ptr = fopen("dataOut/cETgenerator/cetg.bin","wb");  // w for write, b for binary
   if (write_ptr == NULL)
   {
     perror("Failed: ");
@@ -55,7 +55,7 @@ u8* readFromFile(int nBytes){
   buffer = (u8*) malloc (nBytes + 1);
   if (buffer==NULL) exit (1);
   FILE *ptr;
-  ptr = fopen("test.bin","rb");  // r for read, b for binary
+  ptr = fopen("dataOut/cETgenerator/cetg.bin","rb");  // r for read, b for binary
   fread(buffer,nBytes,1,ptr);
   buffer[nBytes]='\0';
   fclose(ptr);
@@ -67,7 +67,7 @@ stateVariables determineSequence(stateVariables stateVars){
   printf("Program Name Is: %s\n",state.argv[0]);
   /* First check to see how many arguments there are. Regardless of what combination is used there should be an off number (including program name)*/
   if(state.argc == 1){
-    printf("\nNo extra command line arguments passed other than the program name.\nTherefore, there the defualt total of random bytes generated is set to 10\nand the probability of 1's and 0's is equal. \nConversely, you can generate the number of bytes required and the probability\nbias for number of 1's with command line arguments. \nFor example, type in your command prompt:\n'./RNGv -N 512 -p 0.35'");
+    printf("\nNo extra command line arguments passed other than the program name.\nTherefore, the defualt total of random bytes generated is set to 10\nand the probability of 1's and 0's is equal. \nConversely, you can generate the number of bytes required and the probability\nbias for number of 1's with command line arguments. \nFor example, type in your command prompt:\n'./RNG -N 512 -p 0.35'");
     state.nBytes = 10;
   }
   else if(state.argc > 5 || state.argc %2 == 0)

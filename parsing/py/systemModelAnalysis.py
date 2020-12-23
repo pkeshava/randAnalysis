@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import csv
 x=[]
 y=[]
-with open('files/rffModeling_vaExponentialSource_vaTFF_vaDFF_digitalOut.csv','r') as csvfile:
+with open('dataIn/csv/rffModeling_vaExponentialSource_vaTFF_vaDFF_digitalOut.csv','r') as csvfile:
     next(csvfile)
     plots = csv.reader(csvfile, delimiter=',')
     for row in plots:
@@ -24,6 +24,7 @@ zipstyle = [(t - s)/25.0 for s, t in zip(time, time[1:])]
 print(zipstyle, sep = "\n")
 import numpy as np
 newlist = list(map(round, zipstyle))
+print(newlist)
 def bitgen(zipstyle, bitsOG):
     if(bitsOG):
         return  np.ones(zipstyle)

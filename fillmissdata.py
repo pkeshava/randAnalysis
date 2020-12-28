@@ -7,6 +7,7 @@ high level support for doing this and that.
 
 import csv
 import numpy as np
+import math
 
 class FillMissData:
     """
@@ -71,6 +72,16 @@ if __name__ == '__main__':
     resultround.tofile(FPW)
     resultimport = np.fromfile(FPW)
     print(resultimport)
+    resultcatbool=np.array(resultround, dtype=bool)
+    resultcatpacked=np.packbits(resultcatbool)
+    FPW2="dataOut/parseCadenceSim/pythonParseCadenceSim2.bin"
+    resultcatpacked.tofile(FPW2)
+    #resultsplit= np.array_split(resultimport, math.ceil(len(resultimport)/8.0))
+    #print(resultsplit)
+    #FPW="dataOut/parseCadenceSim/pythonParseCadenceSimi2.bin"
+    #resultsplit.tofile(FPW)
+    
+
     #print(binlist)
     #result=list(map(dInst.bitgen(),dInst.newlist,dInst.y))
 # References

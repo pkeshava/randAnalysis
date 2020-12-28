@@ -47,11 +47,31 @@ class FillMissData:
 #        else:
 #            return  np.zeros(self.num_miss_timestamp)
 
+def bitgen(num_miss_timestamp, original_bits):
+    """
+    docstring
+    """
+    if original_bits:
+        return  np.ones(num_miss_timestamp)
+    else:
+        return  np.zeros(num_miss_timestamp)
+
+
 if __name__ == '__main__':
-    #FP ="dataIn/csv/RBG_va_tb_only_DIGITALOUT.csv"
-    FP = "dataIn/csv/rffModeling_vaExponentialSource_vaTFF_vaDFF_digitalOut.csv"
+#    FP ="dataIn/csv/RBG_va_tb_only_DIGITALOUT.csv"
+    FP ="dataIn/csv/rffModeling_vaExponentialSource_vaTFF_vaDFF_digitalOut.csv"
     dInst = FillMissData(FP)
     dInst.getdata()
+    result=list(map(bitgen,dInst.newlist,dInst.data))
+    print(result)
+    resultcat = np.concatenate( result, axis=0)
+    resultround = resultcat.round()
+    print(resultround)
+    FPW="dataOut/parseCadenceSim/pythonParseCadenceSim.bin"
+    resultround.tofile(FPW)
+    resultimport = np.fromfile(FPW)
+    print(resultimport)
+    #print(binlist)
     #result=list(map(dInst.bitgen(),dInst.newlist,dInst.y))
 # References
 # zip iterator: https://realpython.com/python-zip-function/

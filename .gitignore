@@ -1,1 +1,6 @@
 *.pdf
+./dataIn/ascii/tran.psfascii
+dataIn/csv/RBG_va_tb.csv
+./dataIn/csv/RBG_va_tb_only_DIGITALOUT.csv
+./.git/objects/pack/tmp_pack_sI61Bp
+./.git/objects/4a/c5ae5dabab12f6aae44a837fe9303aec4a3dbd

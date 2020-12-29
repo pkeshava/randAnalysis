@@ -48,6 +48,11 @@ def bitgen(num_miss_timestamp, original_bits):
         return  np.ones(num_miss_timestamp)
     else:
         return  np.zeros(num_miss_timestamp)
+def calcbias(array):
+    """
+    docstring
+    """
+    return abs(len(array)/2.0-np.sum(array))
 
 
 if __name__ == '__main__':
@@ -66,6 +71,8 @@ if __name__ == '__main__':
     resultcatpacked.tofile(FPW)
     resultimport = np.fromfile(FPW, dtype=np.ubyte)
     print('Array imported:', resultimport)
+    bias=calcbias(resultcatbool)
+    print('Bit bias from random bitstring is: ', bias)
 # References
 # zip iterator: https://realpython.com/python-zip-function/
 # numpy bit packing: https://numpy.org/doc/stable/reference/generated/numpy.packbits.html

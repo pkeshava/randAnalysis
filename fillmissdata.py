@@ -65,17 +65,21 @@ if __name__ == '__main__':
     dInst.getdata()
     result=list(map(bitgen,dInst.newlist,dInst.data))
     print(result)
+    print('Array: ', result)
     resultcat = np.concatenate( result, axis=0)
     resultround = resultcat.round()
-    print(resultround)
-    FPW="dataOut/parseCadenceSim/pythonParseCadenceSim.bin"
-    resultround.tofile(FPW)
-    resultimport = np.fromfile(FPW)
-    print(resultimport)
-    resultcatbool=np.array(resultround, dtype=bool)
+    resultcatbool=np.array(resultround, dtype=np.ubyte)
+    print(resultcatbool)
     resultcatpacked=np.packbits(resultcatbool)
-    FPW2="dataOut/parseCadenceSim/pythonParseCadenceSim2.bin"
-    resultcatpacked.tofile(FPW2)
+    print(resultcatpacked)
+    FPW="dataOut/parseCadenceSim/pythonParseCadenceSim.bin"
+    resultcatpacked.tofile(FPW)
+    resultimport = np.fromfile(FPW, dtype=np.ubyte)
+    print('Array imported:', resultimport)
+
+
+    #FPW2="dataOut/parseCadenceSim/pythonParseCadenceSim2.bin"
+    #resultcatpacked.tofile(FPW2)
     #resultsplit= np.array_split(resultimport, math.ceil(len(resultimport)/8.0))
     #print(resultsplit)
     #FPW="dataOut/parseCadenceSim/pythonParseCadenceSimi2.bin"

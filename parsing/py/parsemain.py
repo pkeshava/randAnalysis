@@ -40,17 +40,18 @@ class FillMissData:
         self.newlist = list(map(round, self.num_miss_timestamp))
         #print('Number of total timesteps per index: ', self.newlist)
 
-def bitgen(num_miss_timestamp, original_bits):
+def complete_bit_array(num_miss_timestamp, original_bits):
     """
-    docstring
+    This function is mapped with the list of timesteps to create a complete
+    array of random values
     """
     if original_bits:
         return  np.ones(num_miss_timestamp)
     else:
         return  np.zeros(num_miss_timestamp)
-def calcbias(array):
+def calc_bias(array):
     """
-    docstring
+    This function calculates the bit bias of an input np array
     """
     return (abs(len(array)/2.0-np.sum(array)))/len(array)
 
@@ -60,7 +61,7 @@ if __name__ == '__main__':
     FP = "dataIn/csv/RBG_va_tb_only_DIGITALOUT.csv"
     dInst = FillMissData(FP)
     dInst.getdata()
-    result=list(map(bitgen,dInst.newlist,dInst.data))
+    result=list(map(complete_bit_array,dInst.newlist,dInst.data))
     resultcat = np.concatenate( result, axis=0)
     resultround = resultcat.round()
     resultcatbool=np.array(resultround, dtype=np.ubyte)
@@ -71,7 +72,7 @@ if __name__ == '__main__':
     resultcatpacked.tofile(FPW)
     resultimport = np.fromfile(FPW, dtype=np.ubyte)
     print('Array imported:', resultimport)
-    bias=calcbias(resultcatbool)
+    bias=calc_bias(resultcatbool)
     print('Bit bias from random bitstring is: ', bias)
 # References
 # zip iterator: https://realpython.com/python-zip-function/

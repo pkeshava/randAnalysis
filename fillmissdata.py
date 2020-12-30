@@ -52,12 +52,12 @@ def calcbias(array):
     """
     docstring
     """
-    return abs(len(array)/2.0-np.sum(array))
+    return (abs(len(array)/2.0-np.sum(array)))/len(array)
 
 
 if __name__ == '__main__':
-#    FP ="dataIn/csv/RBG_va_tb_only_DIGITALOUT.csv"
-    FP ="dataIn/csv/rffModeling_vaExponentialSource_vaTFF_vaDFF_digitalOut.csv"
+    #FP ="dataIn/csv/rffModeling_vaExponentialSource_vaTFF_vaDFF_digitalOut.csv"
+    FP = "dataIn/csv/RBG_va_tb_only_DIGITALOUT.csv"
     dInst = FillMissData(FP)
     dInst.getdata()
     result=list(map(bitgen,dInst.newlist,dInst.data))

@@ -1,5 +1,7 @@
 *.pdf
 ./testing/sts
+./dataIn
+./dataIn/csv/*
 ./dataIn/ascii/tran.psfascii
 ./dataIn/csv/RBG_va_tb.csv
 ./dataIn/csv/RBG_va_tb_only_DIGITALOUT.csv

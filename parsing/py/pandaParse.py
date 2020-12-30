@@ -9,5 +9,4 @@ df=df.loc[:, "SPAD_tester.Anode"]
 print(df)
 
 # References
-# panda parse : https://realpython.com/python-csv/#parsing-csv-files-with-the-pandas-library
 # indexing : https://pythonhow.com/accessing-dataframe-columns-rows-and-cells/

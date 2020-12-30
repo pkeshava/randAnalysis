@@ -1,6 +1,3 @@
-*.pdf
-./testing/sts
-./dataIn/mat/*
-./dataIn/vcd/*
-./dataIn/csv/*
-./dataIn/bin/*
+testing/
+dataIn/
+docs/

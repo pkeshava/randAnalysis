@@ -29,7 +29,7 @@ class FillMissData:
             for row in plots:
                 self.time.append(float(row[0]))
                 self.data.append(float(row[1]))
-        print('Original data:' , self.data)
+        #print('Original data:' , self.data)
         time_s = [i* 1e9 for i in self.time]
         time_s = [round(num,0) for num in time_s]
         # create iterable function for determining number of missed timesteps in data
@@ -38,7 +38,7 @@ class FillMissData:
         # or
         #self.num_miss_timestamp = [(t - s)/25.0 for s, t in zip(time_s, time_s[1:])]
         self.newlist = list(map(round, self.num_miss_timestamp))
-        print('Number of total timesteps per index: ', self.newlist)
+        #print('Number of total timesteps per index: ', self.newlist)
 
 def bitgen(num_miss_timestamp, original_bits):
     """
@@ -64,7 +64,7 @@ if __name__ == '__main__':
     resultcat = np.concatenate( result, axis=0)
     resultround = resultcat.round()
     resultcatbool=np.array(resultround, dtype=np.ubyte)
-    print('Concatenated bits: ', resultcatbool)
+    #print('Concatenated bits: ', resultcatbool)
     resultcatpacked=np.packbits(resultcatbool)
     print(resultcatpacked)
     FPW="dataOut/parseCadenceSim/pythonParseCadenceSim.bin"

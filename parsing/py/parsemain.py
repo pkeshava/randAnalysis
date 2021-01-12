@@ -10,7 +10,7 @@ import numpy as np
 if __name__ == '__main__':
     #FP ="dataIn/csv/rffModeling_vaExponentialSource_vaTFF_vaDFF_digitalOut.csv"
     #FP = "dataIn/csv/RBG_va_tb_only_DIGITALOUT.csv"
-    FP = "dataIn/csv/RBG_va_tb_vtrans500m_only_DIGITALOUT.csv"
+    FP = "dataIn/csv/thresholdAnalysis/RBG_va_tb_vtrans425m_only_DIGITALOUT.csv"
     dInst = parse.FillMissData(FP)
     dInst.getdata()
     result=list(map(dInst.complete_bit_array,dInst.newlist,dInst.data))
@@ -26,5 +26,5 @@ if __name__ == '__main__':
     print('Array imported:', resultimport)
     bias=sa.calc_bias(resultcatbool)
     print('Bit bias from random bitstring is: ', bias)
-    expected_bias=sa.calc_expected_bias(0.499, 1e-10, 1e-10, 50e6)
+    expected_bias=sa.calc_expected_bias(0.425, 1e-10, 1e-10, 50e6)
     print('Expected bit bias from random bitstring is: ', expected_bias)

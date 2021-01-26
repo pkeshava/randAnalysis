@@ -1,0 +1,54 @@
+% This file was created by tikzplotlib v0.9.6.
+\begin{tikzpicture}
+
+\begin{axis}[
+legend cell align={left},
+legend style={fill opacity=0.8, draw opacity=1, text opacity=1, at={(0.03,0.03)}, anchor=south west, draw=white!80!black},
+tick align=outside,
+tick pos=left,
+x grid style={white!69.0196078431373!black},
+xmin=0.18505, xmax=0.51395,
+xtick style={color=black},
+y grid style={white!69.0196078431373!black},
+ymin=-7.48875e-05, ymax=0.0016826375,
+ytick style={color=black}
+]
+\addplot [only marks, mark=square*, draw=blue, fill=blue, colormap/viridis]
+table{%
+x                      y
+0.2 0.0015
+0.225 0.001375
+0.25 0.00125
+0.275 0.001125
+0.3 0.001
+0.325 0.000875
+0.35 0.00075
+0.375 0.000625
+0.4 0.0005
+0.425 0.000375
+0.45 0.00025
+0.475 0.000125
+0.499 5e-06
+};
+\addlegendentry{Model Prediction}
+\addplot [only marks, mark=*, draw=red, fill=red, colormap/viridis]
+table{%
+x                      y
+0.2 0.00160275
+0.225 0.00146925
+0.25 0.0013385
+0.275 0.001206
+0.3 0.0010825
+0.325 0.00097075
+0.35 0.00084275
+0.375 0.0007155
+0.4 0.00059525
+0.425 0.00047575
+0.45 0.00034675
+0.475 0.0002255
+0.499 0.0001075
+};
+\addlegendentry{Circuit Sim}
+\end{axis}
+
+\end{tikzpicture}

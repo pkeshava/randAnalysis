@@ -22,7 +22,7 @@ if __name__ == '__main__':
     #ac2 = np.empty(shape=[100000,1])
     lags=range(2)
 
-    for i in range(len(vt)):
+    for i, vt in enumerate(vt):
         FP = filepaths[i]
         dInst = parse.FillMissData(FP)
         dInst.getdata()
@@ -41,8 +41,7 @@ if __name__ == '__main__':
         bias = sa.calc_bias(resultcatbool)
         sb[i] = bias
         print('Bit bias from random bitstring is: ', bias)
-        vtvalue = vt[i]
-        expected_bias = sa.calc_expected_bias(vtvalue, 2e-10, 2e-10, 50e6)
+        expected_bias = sa.calc_expected_bias(vt, 2e-10, 2e-10, 50e6)
         eb[i] = expected_bias
         print('Expected bit bias from random bitstring is: ', expected_bias)
         autocorr = sa.autocorr1(resultcatbool, lags)

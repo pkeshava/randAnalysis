@@ -44,6 +44,7 @@ def autocorr1(x, lags):
     corr = [1. if lag == 0 else np.corrcoef(x[lag:], x[:-lag])[0][1] for lag in lags]
     return np.array(corr)
 
+
 def autocorr2(x, lags):
     '''manualy compute, non partial'''
 

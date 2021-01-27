@@ -45,7 +45,9 @@ if __name__ == '__main__':
         eb[i] = expected_bias
         print('Expected bit bias from random bitstring is: ', expected_bias)
         autocorr = sa.autocorr1(resultcatbool, lags)
-        print('1d bit lag autocorrelation from random bitstring is: ', autocorr)
+        print('autocorrelation from random bitstring is: ', autocorr)
+        autocorr = sa.autocorr2(resultcatbool, lags)
+        print('autocorrelation non-partial from random bitstring is: ', autocorr)
 print(eb)
 print(sb)
 #np.savetxt('dataIn/txt/expectedbias_trtf200ns.txt', eb, delimiter=',')

@@ -48,9 +48,9 @@ percent_hot = 0.01
 percent_screaming = 0.001
 sampling_rates = [10e6, 20e6, 30e6, 40e6, 50e6]
 count_rates = [100e5, 1e6, 10e6, 50e6, 80e6]
-#num_bits_generated = np.array([16777216])
+num_bits_generated = np.array([1024])
 # djenrandom generates in 2kB blocks i.e 500 = 1MB
-num_byte_blocks = np.array([1])
+#num_byte_blocks = np.array([1])
 
 
 # determine number of hot pixels and screamers using a binomial distribution
@@ -118,9 +118,9 @@ exp_biases, probs_of_ones = calc_exp_bias_perPix(pixel_count, rff_mu, rff_sigma,
 
 #%%
 
-def gen_bits_with_bias(num_byte_blocks,bias):
-    #args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/c/RNG", "-N", num_bits, "-p", bias)
-    args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/djenrandom-master/djenrandom", "-m", "biased", "--bias", bias, '-k', num_byte_blocks,'-o', 'dataOut/djen/djen.bin')
+def gen_bits_with_bias(num_bits_str,bias):
+    args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/c/RNG", "-N", num_bits_str, "-p", bias)
+    #args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/djenrandom-master/djenrandom", "-m", "biased", "--bias", bias, '-k', num_byte_blocks,'-o', 'dataOut/djen/djen.bin')
     #Or just:
     #args = "bin/bar -c somefile.xml -d text.txt -r aString -f anotherString".split()
     popen = subprocess.Popen(args, stdout=subprocess.PIPE)
@@ -131,8 +131,8 @@ def gen_bits_with_bias(num_byte_blocks,bias):
     #while byte:
     #    byte = file.read(1)
     #file.close()
-    #xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
-    xbash = np.fromfile('dataOut/djen/djen.bin', dtype='uint8')
+    xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
+    #xbash = np.fromfile('dataOut/djen/djen.bin', dtype='uint8')
     p = np.unpackbits(xbash, axis=0)
     bias_from_file = calc_bias(p)
 
@@ -144,12 +144,12 @@ def gen_bits_with_bias(num_byte_blocks,bias):
     return bias_from_file, delta
     
 #%%
-def convert_values_to_str(probs_of_ones, num_byte_blocks):
+def convert_values_to_str(probs_of_ones, num_bits_generated):
     prob_ones_str= ["".join(item) for item in probs_of_ones.astype(str)]
-    num_byte_blocks_str= ["".join(item) for item in num_byte_blocks.astype(str)]
-    return prob_ones_str, num_byte_blocks_str
+    num_bits_str= ["".join(item) for item in num_bits_generated.astype(str)]
+    return prob_ones_str, num_bits_str
 
 
-prob_ones_str, num_byte_blocks_str = convert_values_to_str(probs_of_ones, num_byte_blocks)
-bias_from_file, delta = gen_bits_with_bias(num_byte_blocks_str[0],prob_ones_str[0])
+prob_ones_str, num_bits_str = convert_values_to_str(probs_of_ones, num_bits_generated)
+bias_from_file, delta = gen_bits_with_bias(num_bits_str[0],prob_ones_str[0])
 #bias_from_file = gen_bits_with_bias('500','0.15')

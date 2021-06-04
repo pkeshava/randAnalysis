@@ -11,6 +11,34 @@ Modelling TC3 chip
 import numpy as np
 import random
 from math import sqrt
+import subprocess
+
+#%%
+    
+def calc_bias(array):
+    """
+    This function calculates the bit bias of an input np array
+    More specifically the probabiliy of ones
+    """
+    x = (len(array)/2.0-np.sum(array))/len(array)
+    return 0.5-x
+
+def calc_expected_bias(vt, tr, tf, fdet):
+    """
+    This function calculates the expected bias from a random ff
+    with an exponential source or rather a uniformally distributed
+    tff signal based on vt (sampling threshold), rise and fall times
+    of the tff signal (tr tf) and the detection rate i.e. photon
+    count rate
+    """
+    bias = (0.5-vt)*(tr+tf)*fdet/2
+    prob_of_ones = 0.5+(0.5-vt)*(tr+tf)*fdet/2
+    return bias, prob_of_ones
+    
+
+def bitfield(n):
+    return [1 if digit=='1' else 0 for digit in bin(n)[2:]]
+#%%
 # tr, tf, eta
 rff_mu = [4e-11, 4e-11, 0.505]
 # tr, tf, eta
@@ -20,6 +48,10 @@ percent_hot = 0.01
 percent_screaming = 0.001
 sampling_rates = [10e6, 20e6, 30e6, 40e6, 50e6]
 count_rates = [100e5, 1e6, 10e6, 50e6, 80e6]
+#num_bits_generated = np.array([16777216])
+# djenrandom generates in 2kB blocks i.e 500 = 1MB
+num_byte_blocks = np.array([1])
+
 
 # determine number of hot pixels and screamers using a binomial distribution
 num_hot = np.random.binomial(num_of_pixels, percent_hot)
@@ -63,24 +95,61 @@ def assign_count_rates(pos_hot,pos_scream, num_of_pixels, count_rate):
     return pixel_count_rates
 
 pixel_count = assign_count_rates(pos_hot,pos_scream, num_of_pixels, count_rates[0])
-            
-    
+
+# For a number of BIT_GEN_CYCLES           
+
+#%% Calculate expected bias per pixel for 
+
+def calc_exp_bias_perPix(pixel_count, rff_mu, rff_sigma, count_rate):
+    exp_biases = np.array([])
+    probs_of_ones = np.array([])
+    for i, pixel_count in enumerate(pixel_count):
+        tr = np.random.normal(rff_mu[0], rff_sigma[0])
+        tf = np.random.normal(rff_mu[1], rff_sigma[1])
+        vt = np.random.normal(rff_mu[2], rff_sigma[2])
+        fdet = count_rate
+        exp_bias, prob_of_ones = calc_expected_bias(vt, tr, tf, fdet)
+        exp_biases = np.append(exp_biases,[exp_bias])
+        probs_of_ones = np.append(probs_of_ones,[prob_of_ones])
+    return exp_biases, probs_of_ones
+
+exp_biases, probs_of_ones = calc_exp_bias_perPix(pixel_count, rff_mu, rff_sigma, count_rates[4])
+
 
 #%%
 
-    
-def calc_bias(array):
-    """
-    This function calculates the bit bias of an input np array
-    """
-    return (len(array)/2.0-np.sum(array))/len(array)
+def gen_bits_with_bias(num_byte_blocks,bias):
+    #args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/c/RNG", "-N", num_bits, "-p", bias)
+    args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/djenrandom-master/djenrandom", "-m", "biased", "--bias", bias, '-k', num_byte_blocks,'-o', 'dataOut/djen/djen.bin')
+    #Or just:
+    #args = "bin/bar -c somefile.xml -d text.txt -r aString -f anotherString".split()
+    popen = subprocess.Popen(args, stdout=subprocess.PIPE)
+    popen.wait()
+    #file = open("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/djenrandom-master/out.bin", "rb")
+    #file = open("dataOut/cETgenerator/cetg.bin", "rb")
+    #byte = file.read(1)
+    #while byte:
+    #    byte = file.read(1)
+    #file.close()
+    #xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
+    xbash = np.fromfile('dataOut/djen/djen.bin', dtype='uint8')
+    p = np.unpackbits(xbash, axis=0)
+    bias_from_file = calc_bias(p)
 
-def calc_expected_bias(vt, tr, tf, fdet):
-    """
-    This function calculates the expected bias from a random ff
-    with an exponential source or rather a uniformally distributed
-    tff signal based on vt (sampling threshold), rise and fall times
-    of the tff signal (tr tf) and the detection rate i.e. photon
-    count rate
-    """
-    return (0.5-vt)*(tr+tf)*fdet/2
+    print("Requested bit bias:")
+    print(bias)
+    print("Generated bit bias:")
+    print(bias_from_file)
+    delta = bias_from_file-float(bias)
+    return bias_from_file, delta
+    
+#%%
+def convert_values_to_str(probs_of_ones, num_byte_blocks):
+    prob_ones_str= ["".join(item) for item in probs_of_ones.astype(str)]
+    num_byte_blocks_str= ["".join(item) for item in num_byte_blocks.astype(str)]
+    return prob_ones_str, num_byte_blocks_str
+
+
+prob_ones_str, num_byte_blocks_str = convert_values_to_str(probs_of_ones, num_byte_blocks)
+bias_from_file, delta = gen_bits_with_bias(num_byte_blocks_str[0],prob_ones_str[0])
+#bias_from_file = gen_bits_with_bias('500','0.15')

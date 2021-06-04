@@ -117,39 +117,117 @@ exp_biases, probs_of_ones = calc_exp_bias_perPix(pixel_count, rff_mu, rff_sigma,
 
 
 #%%
-
-def gen_bits_with_bias(num_bits_str,bias):
-    args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/c/RNG", "-N", num_bits_str, "-p", bias)
-    #args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/djenrandom-master/djenrandom", "-m", "biased", "--bias", bias, '-k', num_byte_blocks,'-o', 'dataOut/djen/djen.bin')
-    #Or just:
-    #args = "bin/bar -c somefile.xml -d text.txt -r aString -f anotherString".split()
-    popen = subprocess.Popen(args, stdout=subprocess.PIPE)
-    popen.wait()
-    #file = open("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/djenrandom-master/out.bin", "rb")
-    #file = open("dataOut/cETgenerator/cetg.bin", "rb")
-    #byte = file.read(1)
-    #while byte:
-    #    byte = file.read(1)
-    #file.close()
-    xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
-    #xbash = np.fromfile('dataOut/djen/djen.bin', dtype='uint8')
-    p = np.unpackbits(xbash, axis=0)
-    bias_from_file = calc_bias(p)
-
-    print("Requested bit bias:")
-    print(bias)
-    print("Generated bit bias:")
-    print(bias_from_file)
-    delta = bias_from_file-float(bias)
-    return bias_from_file, delta
-    
-#%%
 def convert_values_to_str(probs_of_ones, num_bits_generated):
     prob_ones_str= ["".join(item) for item in probs_of_ones.astype(str)]
     num_bits_str= ["".join(item) for item in num_bits_generated.astype(str)]
     return prob_ones_str, num_bits_str
 
+def convert_array_vals_to_str(arry):
+    arry_str= ["".join(item) for item in arry.astype(str)]
+    return arry_str
 
-prob_ones_str, num_bits_str = convert_values_to_str(probs_of_ones, num_bits_generated)
-bias_from_file, delta = gen_bits_with_bias(num_bits_str[0],prob_ones_str[0])
+def gen_bits_with_bias(num_bits_to_generate,prob_of_ones):
+    if(num_bits_to_generate>100000000):
+        print("TOO MANY BITS!")
+        return
+    elif(num_bits_to_generate>1048576 & num_bits_to_generate<=100000000):
+        num_calls = num_bits_to_generate // 1048576
+        remainder = num_bits_to_generate % 1048576
+        bits_concat = np.array([])
+        for i in range(num_calls):
+            prob_ones_str, num_bits_str = convert_values_to_str(prob_of_ones, num_bits_to_generate)
+            args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/c/RNG", "-N", '1048576', "-p", prob_ones_str)
+            popen = subprocess.Popen(args, stdout=subprocess.PIPE)
+            popen.wait()
+            xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
+            p = np.unpackbits(xbash, axis=0)
+            bits_concat= np.append(bits_concat,p)
+        if(remainder > 0):
+            prob_ones_str, num_bits_str = convert_values_to_str(prob_of_ones, remainder)
+            args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/c/RNG", "-N", num_bits_str, "-p", prob_ones_str)
+            popen = subprocess.Popen(args, stdout=subprocess.PIPE)
+            popen.wait()
+            xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
+            p = np.unpackbits(xbash, axis=0)
+            bits_concat= np.append(bits_concat,p)
+
+        bias_from_file = calc_bias(bits_concat)
+
+
+    else:
+        prob_ones_str, num_bits_str = convert_values_to_str(prob_of_ones, num_bits_to_generate)
+        args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/c/RNG", "-N", num_bits_str, "-p", prob_ones_str)
+        popen = subprocess.Popen(args, stdout=subprocess.PIPE)
+        popen.wait()
+        xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
+        #xbash = np.fromfile('dataOut/djen/djen.bin', dtype='uint8')
+        p = np.unpackbits(xbash, axis=0)
+        bias_from_file = calc_bias(p)
+
+    print("Requested bit bias:")
+    print(probs_of_ones)
+    print("Generated bit bias:")
+    print(bias_from_file)
+    delta = bias_from_file-probs_of_ones
+    return bias_from_file, delta
+    
+#%%
+
+
+
+#bias_from_file, delta = gen_bits_with_bias(num_bits_str[0],prob_ones_str[0])
 #bias_from_file = gen_bits_with_bias('500','0.15')
+
+num_bytes_to_generate = np.array([13107400])
+prob_of_ones = np.array([0.5000313615528872])
+
+if(num_bytes_to_generate[0]>100000000):
+    print("TOO MANY BITS!")
+elif(num_bytes_to_generate[0]>131072 and num_bytes_to_generate[0]<=100000000):
+    num_calls = num_bytes_to_generate[0] // 131072
+    remainder = num_bytes_to_generate[0] % 131072
+    bits_concat = np.array([], dtype=bool)
+    for i in range(num_calls):
+        prob_ones_str, num_bits_str = convert_values_to_str(prob_of_ones, num_bytes_to_generate)
+        #num_bits_str = convert_array_vals_to_str(num_bits_to_generate)
+        #prob_ones_str = convert_array_vals_to_str(prob_of_ones)
+        args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/c/RNG", "-N", '131072', "-p", prob_ones_str[0])
+        popen = subprocess.Popen(args, stdout=subprocess.PIPE)
+        popen.wait()
+        xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
+        p = np.unpackbits(xbash, axis=0)
+        bits_concat= np.append(bits_concat,p)
+    if(remainder > 0):
+        prob_ones_str, num_bits_str = convert_values_to_str(probs_of_ones, remainder)
+        args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/c/RNG", "-N", num_bits_str[0], "-p", prob_ones_str[0])
+        popen = subprocess.Popen(args, stdout=subprocess.PIPE)
+        popen.wait()
+        xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
+        p = np.unpackbits(xbash, axis=0)
+        bits_concat= np.append(bits_concat,p)
+
+    bias_from_file = calc_bias(bits_concat)
+    testtrash= 6
+
+else:
+    prob_ones_str, num_bits_str = convert_values_to_str(prob_of_ones, num_bytes_to_generate)
+    args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/c/RNG", "-N", num_bits_str[0], "-p", prob_ones_str[0])
+    popen = subprocess.Popen(args, stdout=subprocess.PIPE)
+    popen.wait()
+    xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
+    testtrash= 5
+    #xbash = np.fromfile('dataOut/djen/djen.bin', dtype='uint8')
+    p = np.unpackbits(xbash, axis=0)
+    bias_from_file = calc_bias(p)
+
+num_bits_generated = num_bytes_to_generate[0]*8
+
+print("Requested bit bias:")
+print(probs_of_ones[0])
+print("Generated bit bias:")
+print(bias_from_file)
+delta = bias_from_file-prob_of_ones[0]
+
+
+
+

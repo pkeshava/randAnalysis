@@ -48,7 +48,7 @@ percent_hot = 0.01
 percent_screaming = 0.001
 sampling_rates = [10e6, 20e6, 30e6, 40e6, 50e6]
 count_rates = [100e5, 1e6, 10e6, 50e6, 80e6]
-num_bytes_to_generate = np.array([13107400])
+num_bytes_to_generate = np.array([1310720])
 #num_bits_generated = np.array([1024])
 # djenrandom generates in 2kB blocks i.e 500 = 1MB
 #num_byte_blocks = np.array([1])
@@ -127,7 +127,7 @@ def convert_array_vals_to_str(arry):
     arry_str= ["".join(item) for item in arry.astype(str)]
     return arry_str
 
-def gen_bits_with_bias(num_bytes_to_generate,prob_of_ones):
+def gen_bits_with_bias(num_bytes_to_generate,prob_of_ones, pixel_num):
     if(num_bytes_to_generate[0]>100000000):
         print("TOO MANY BITS!")
         return
@@ -164,9 +164,13 @@ def gen_bits_with_bias(num_bytes_to_generate,prob_of_ones):
         xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
         #xbash = np.fromfile('dataOut/djen/djen.bin', dtype='uint8')
         p = np.unpackbits(xbash, axis=0)
+        bits_concat= p
         bias_from_file = calc_bias(p)
     
     num_bits_generated = num_bytes_to_generate[0]*8
+    
+    filename = '/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/modelling/dataOut/cETgenerator/SPADdata/spad{}.bin'.format(pixel_num)
+    bits_concat.astype('uint8').tofile(filename)
     
     print("Requested bit bias:")
     print(probs_of_ones[0])
@@ -176,33 +180,27 @@ def gen_bits_with_bias(num_bytes_to_generate,prob_of_ones):
     return delta, num_bits_generated, bias_from_file
     
 #%%
-
-delta, num_bits_from_file, bias_from_file = gen_bits_with_bias(np.array([num_bytes_to_generate[0]]),np.array([probs_of_ones[0]]))
-x = 5
-
-#%%
-#import os
-#print(os.environ['PATH'])
-#os.environ["PATH"] += os.pathsep + '/usr/local/texlive/2020/bin/x86_64-darwin'
-#os.environ["PATH"] += os.pathsep + '/usr/local/bin/convert'
-#print(os.environ['PATH'])
-#%%
-
-from lcapy import Circuit
-a = Circuit("""
-V 1 0 6; down=1.5
-R1 1 2 2; right=1.5
-R2 2 0_2 4; down
-W 0 0_2; right""")
-a.draw()
+num_pixels_test = 8
+for pixel_num in range(num_pixels_test):
+    delta, num_bits_from_file, bias_from_file = gen_bits_with_bias(np.array([num_bytes_to_generate[0]]),np.array([probs_of_ones[0]]), pixel_num)
+    
 
 #%%
-import os
-#print(os.environ['PATH'])
-#os.environ["PATH"] += os.pathsep + '/usr/local/texlive/2020/bin/x86_64-darwin'
-#%%
+#num_bits = 8*num_bytes_to_generate[0]
+num_bits = 128
+def gen_keys(num_pixels_test,num_bits):
+    bitBeingAnal = np.zeros(num_pixels_test, dtype='uint8')
+    key = np.zeros(num_bits, dtype='uint8')
+    
+    for bit in range(num_bits):
+        for pixel in range(num_pixels_test):
+            xbash = np.fromfile('/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/modelling/dataOut/cETgenerator/SPADdata/spad{}.bin'.format(pixel), dtype='uint8')
+            bitBeingAnal[pixel] = xbash[bit]
+    
+        key[bit] = np.packbits(bitBeingAnal, axis=0)
+    return key
 
+keygenfuncvalues=gen_keys(num_pixels_test,num_bits)
+unique_keys_generated, counts_for_each_key = np.unique(keygenfuncvalues, return_counts=True)
+most_common_key =unique_keys_generated[counts_for_each_key.argmax()]
 
-#%%
-#os.environ["PATH"] += os.pathsep + os.pathsep.join(["/Library/TeX/texbin/pdflatex"])
-#print(os.environ['PATH'])

@@ -155,7 +155,6 @@ def gen_bits_with_bias(num_bytes_to_generate,prob_of_ones):
             bits_concat= np.append(bits_concat,p)
     
         bias_from_file = calc_bias(bits_concat)
-        testtrash= 6
     
     else:
         prob_ones_str, num_bits_str = convert_values_to_str(prob_of_ones, num_bytes_to_generate)
@@ -163,7 +162,6 @@ def gen_bits_with_bias(num_bytes_to_generate,prob_of_ones):
         popen = subprocess.Popen(args, stdout=subprocess.PIPE)
         popen.wait()
         xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
-        testtrash= 5
         #xbash = np.fromfile('dataOut/djen/djen.bin', dtype='uint8')
         p = np.unpackbits(xbash, axis=0)
         bias_from_file = calc_bias(p)
@@ -182,58 +180,29 @@ def gen_bits_with_bias(num_bytes_to_generate,prob_of_ones):
 delta, num_bits_from_file, bias_from_file = gen_bits_with_bias(np.array([num_bytes_to_generate[0]]),np.array([probs_of_ones[0]]))
 x = 5
 
-#bias_from_file = gen_bits_with_bias('500','0.15')
 #%%
-num_bytes_to_generate = np.array([13107400])
-prob_of_ones = np.array([0.5000313615528872])
+#import os
+#print(os.environ['PATH'])
+#os.environ["PATH"] += os.pathsep + '/usr/local/texlive/2020/bin/x86_64-darwin'
+#os.environ["PATH"] += os.pathsep + '/usr/local/bin/convert'
+#print(os.environ['PATH'])
+#%%
 
-if(num_bytes_to_generate[0]>100000000):
-    print("TOO MANY BITS!")
-elif(num_bytes_to_generate[0]>131072 and num_bytes_to_generate[0]<=100000000):
-    num_calls = num_bytes_to_generate[0] // 131072
-    remainder = num_bytes_to_generate[0] % 131072
-    bits_concat = np.array([], dtype=bool)
-    for i in range(num_calls):
-        prob_ones_str, num_bits_str = convert_values_to_str(prob_of_ones, num_bytes_to_generate)
-        #num_bits_str = convert_array_vals_to_str(num_bits_to_generate)
-        #prob_ones_str = convert_array_vals_to_str(prob_of_ones)
-        args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/c/RNG", "-N", '131072', "-p", prob_ones_str[0])
-        popen = subprocess.Popen(args, stdout=subprocess.PIPE)
-        popen.wait()
-        xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
-        p = np.unpackbits(xbash, axis=0)
-        bits_concat= np.append(bits_concat,p)
-    if(remainder > 0):
-        prob_ones_str, num_bits_str = convert_values_to_str(probs_of_ones, remainder)
-        args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/c/RNG", "-N", num_bits_str[0], "-p", prob_ones_str[0])
-        popen = subprocess.Popen(args, stdout=subprocess.PIPE)
-        popen.wait()
-        xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
-        p = np.unpackbits(xbash, axis=0)
-        bits_concat= np.append(bits_concat,p)
+from lcapy import Circuit
+a = Circuit("""
+V 1 0 6; down=1.5
+R1 1 2 2; right=1.5
+R2 2 0_2 4; down
+W 0 0_2; right""")
+a.draw()
 
-    bias_from_file = calc_bias(bits_concat)
-    testtrash= 6
-
-else:
-    prob_ones_str, num_bits_str = convert_values_to_str(prob_of_ones, num_bytes_to_generate)
-    args = ("/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/generation/c/RNG", "-N", num_bits_str[0], "-p", prob_ones_str[0])
-    popen = subprocess.Popen(args, stdout=subprocess.PIPE)
-    popen.wait()
-    xbash = np.fromfile('dataOut/cETgenerator/cetg.bin', dtype='uint8')
-    testtrash= 5
-    #xbash = np.fromfile('dataOut/djen/djen.bin', dtype='uint8')
-    p = np.unpackbits(xbash, axis=0)
-    bias_from_file = calc_bias(p)
-
-num_bits_generated = num_bytes_to_generate[0]*8
-
-print("Requested bit bias:")
-print(probs_of_ones[0])
-print("Generated bit bias:")
-print(bias_from_file)
-delta = bias_from_file-prob_of_ones[0]
+#%%
+import os
+#print(os.environ['PATH'])
+#os.environ["PATH"] += os.pathsep + '/usr/local/texlive/2020/bin/x86_64-darwin'
+#%%
 
 
-
-
+#%%
+#os.environ["PATH"] += os.pathsep + os.pathsep.join(["/Library/TeX/texbin/pdflatex"])
+#print(os.environ['PATH'])

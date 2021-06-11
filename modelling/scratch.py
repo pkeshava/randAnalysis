@@ -43,12 +43,16 @@ def bitfield(n):
 rff_mu = [4e-11, 4e-11, 0.505]
 # tr, tf, eta
 rff_sigma = [5e-12, 5e-12, 0.025]
-num_of_pixels = 256
+num_of_pixels = 32
 percent_hot = 0.01
 percent_screaming = 0.001
 sampling_rates = [10e6, 20e6, 30e6, 40e6, 50e6]
 count_rates = [100e5, 1e6, 10e6, 50e6, 80e6]
-num_bytes_to_generate = np.array([1310720])
+
+#num_bytes_to_generate = np.array([1310720])
+num_bytes_to_generate = np.array([102400])
+num_bits = 8*num_bytes_to_generate[0]
+
 #num_bits_generated = np.array([1024])
 # djenrandom generates in 2kB blocks i.e 500 = 1MB
 #num_byte_blocks = np.array([1])
@@ -170,7 +174,11 @@ def gen_bits_with_bias(num_bytes_to_generate,prob_of_ones, pixel_num):
     num_bits_generated = num_bytes_to_generate[0]*8
     
     filename = '/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/modelling/dataOut/cETgenerator/SPADdata/spad{}.bin'.format(pixel_num)
+    filenametxt = '/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/modelling/dataOut/cETgenerator/SPADdata/spad{}.txt'.format(pixel_num)
+
     bits_concat.astype('uint8').tofile(filename)
+    np.savetxt(filenametxt, bits_concat, delimiter=',', fmt='%1.0u')
+    
     
     print("Requested bit bias:")
     print(probs_of_ones[0])
@@ -180,27 +188,41 @@ def gen_bits_with_bias(num_bytes_to_generate,prob_of_ones, pixel_num):
     return delta, num_bits_generated, bias_from_file
     
 #%%
-num_pixels_test = 8
-for pixel_num in range(num_pixels_test):
+import time
+from random import SystemRandom
+cryptogen = SystemRandom()
+for pixel_num in range(num_of_pixels):
     delta, num_bits_from_file, bias_from_file = gen_bits_with_bias(np.array([num_bytes_to_generate[0]]),np.array([probs_of_ones[0]]), pixel_num)
-    
+    #timeforsleep = random.uniform(1.4757698908065398081,0.902123422) # Sleep for 3 seconds
+    timeforsleep = 352.9136786423423123056456495*cryptogen.random()
+    time.sleep(timeforsleep) # Sleep for 3 seconds
+
 
 #%%
-#num_bits = 8*num_bytes_to_generate[0]
-num_bits = 128
-def gen_keys(num_pixels_test,num_bits):
-    bitBeingAnal = np.zeros(num_pixels_test, dtype='uint8')
-    key = np.zeros(num_bits, dtype='uint8')
+def gen_keys(num_of_pixels,num_bits):
+    bitBeingAnal = np.zeros(num_of_pixels, dtype='uint8')
+    key = np.zeros(num_bits, dtype='uint32')
     
     for bit in range(num_bits):
-        for pixel in range(num_pixels_test):
+        for pixel in range(num_of_pixels):
             xbash = np.fromfile('/Users/Pouyan/Builds/PhD/research_PhD/builds_PhD/randAnalysis/modelling/dataOut/cETgenerator/SPADdata/spad{}.bin'.format(pixel), dtype='uint8')
             bitBeingAnal[pixel] = xbash[bit]
-    
-        key[bit] = np.packbits(bitBeingAnal, axis=0)
+        # the -1 is because of the machine endian... otherwise when you imply .view it doesn't work...
+        shaped_into_bytes =  np.packbits(bitBeingAnal.reshape(1, 4, 8)[:, ::-1])
+        key[bit] = shaped_into_bytes.view(np.uint32)
+        #key[bit] = np.packbits(bitBeingAnal, axis=0,dtype=np.uint8)
     return key
 
-keygenfuncvalues=gen_keys(num_pixels_test,num_bits)
+keygenfuncvalues=gen_keys(num_of_pixels,num_bits)
 unique_keys_generated, counts_for_each_key = np.unique(keygenfuncvalues, return_counts=True)
 most_common_key =unique_keys_generated[counts_for_each_key.argmax()]
+
+def estimate_min_entropy(num_of_pixels, counts_for_each_key):
+    number_of_possible_keys = 2**num_of_pixels
+    p = max(counts_for_each_key)/number_of_possible_keys
+    min_entropy_simulated_based_on_biased_bits = -np.log2(p)
+    return min_entropy_simulated_based_on_biased_bits
+#%%
+
+min_entropy_simulated_based_on_biased_bits = estimate_min_entropy(num_of_pixels, counts_for_each_key)
 

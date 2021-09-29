@@ -125,7 +125,8 @@ u8* pu8GenBiasedRdmBitStream (int nBytes, float p){
   u8 bit = 0;
   asciiBstream = (u8*) malloc (nBytes + 1);
   if (asciiBstream==NULL) exit (1);
-  srand((unsigned int) time (NULL)); // create a seed by reading epoch time
+  srand(time(NULL) + getpid()); // create a seed by reading epoch time
+  //srand(getpid()); // create a seed by reading epoch time
   for (int i = 0; i < nBytes; i++)
   {
     asciiBstream[i] = 0;
@@ -134,7 +135,8 @@ u8* pu8GenBiasedRdmBitStream (int nBytes, float p){
     bit = 0;
     for (int j = 0; j < 8; j++)
     {
-      fRnd = (float) rand() / nextafter(RAND_MAX, DBL_MAX);
+      //fRnd = (float) rand() / nextafter(RAND_MAX, DBL_MAX);
+      fRnd = (u32) rand() / nextafter(RAND_MAX, DBL_MAX);
       if (p < fRnd){
         // NOTE should it be p <=?
         bit = 0 << j;

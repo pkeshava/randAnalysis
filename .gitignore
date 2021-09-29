@@ -1,5 +1,8 @@
 testing/
 dataIn/
+dataOut/
 docs/
 parsing/py/__pycache__/
 *.bin
+*.ipynb_*
+*__pycache*

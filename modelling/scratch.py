@@ -50,7 +50,7 @@ sampling_rates = [10e6, 20e6, 30e6, 40e6, 50e6]
 count_rates = [100e5, 1e6, 10e6, 50e6, 80e6]
 
 #num_bytes_to_generate = np.array([1310720])
-num_bytes_to_generate = np.array([102400])
+num_bytes_to_generate = np.array([10240])
 num_bits = 8*num_bytes_to_generate[0]
 
 #num_bits_generated = np.array([1024])
@@ -194,8 +194,9 @@ cryptogen = SystemRandom()
 for pixel_num in range(num_of_pixels):
     delta, num_bits_from_file, bias_from_file = gen_bits_with_bias(np.array([num_bytes_to_generate[0]]),np.array([probs_of_ones[0]]), pixel_num)
     #timeforsleep = random.uniform(1.4757698908065398081,0.902123422) # Sleep for 3 seconds
-    timeforsleep = 352.9136786423423123056456495*cryptogen.random()
-    time.sleep(timeforsleep) # Sleep for 3 seconds
+    timeforsleep = 142.9132786423493723056456495*cryptogen.random()
+    print(timeforsleep)
+    time.sleep(timeforsleep) # Sleep
 
 
 #%%
@@ -216,7 +217,7 @@ def gen_keys(num_of_pixels,num_bits):
 keygenfuncvalues=gen_keys(num_of_pixels,num_bits)
 unique_keys_generated, counts_for_each_key = np.unique(keygenfuncvalues, return_counts=True)
 most_common_key =unique_keys_generated[counts_for_each_key.argmax()]
-
+#%%
 def estimate_min_entropy(num_of_pixels, counts_for_each_key):
     number_of_possible_keys = 2**num_of_pixels
     p = max(counts_for_each_key)/number_of_possible_keys
@@ -224,5 +225,69 @@ def estimate_min_entropy(num_of_pixels, counts_for_each_key):
     return min_entropy_simulated_based_on_biased_bits
 #%%
 
+min_entropy_simulated_based_on_biased_bits = estimate_min_entropy(num_of_pixels, counts_for_each_key)
+
+
+#%%
+
+from random import SystemRandom
+cryptogen = SystemRandom()
+import secrets
+
+def gen_bits_using_secrets(num_bits):
+    secret_random = secrets.token_bytes(num_bits//8)
+    f = open('dataOut/secrets/test.bin', 'wb')
+    f.write(secret_random)
+    f.close()
+
+gen_bits_using_secrets(num_bits)
+
+
+#%%
+#%%
+import secrets
+import numpy as np
+import time
+
+num_bytes_to_generate = np.array([10240])
+num_bits = 8*num_bytes_to_generate[0]
+num_of_pixels = 32
+
+def gen_bytes_using_secrets(num_bytes_to_generate, pixel_num):
+    if(num_bytes_to_generate>100000000):
+        print("TOO MANY BITS!")
+        return
+    else:
+        secret_random = secrets.token_bytes(num_bytes_to_generate)
+        f = open('./dataOut/secrets/spad{}.bin'.format(pixel_num), 'wb')
+        f.write(secret_random)
+        f.close()
+#%%
+from random import SystemRandom
+cryptogen = SystemRandom()
+for pixel_num in range(num_of_pixels):
+    gen_bytes_using_secrets(num_bytes_to_generate[0], pixel_num)
+    timeforsleep = 27.9136786423423123056456495*cryptogen.random()
+    time.sleep(timeforsleep) # Sleep for 3 seconds
+#%%
+
+def gen_keys(num_of_pixels,num_bits):
+    #bitBeingAnal = np.zeros(num_of_pixels, dtype='uint8')
+    #key = np.zeros(num_bits, dtype='uint32')
+    
+    for bit in range(num_bits):
+        for pixel in range(num_of_pixels):
+            key = np.fromfile('./dataOut/secrets/spad{}.bin'.format(pixel), dtype='uint8')
+            #bitBeingAnal[pixel] = data[bit]
+        # the -1 is because of the machine endian... otherwise when you imply .view it doesn't work...
+        #shaped_into_bytes =  np.packbits(bitBeingAnal.reshape(1, 4, 8)[:, ::-1])
+        #key[bit] = shaped_into_bytes.view(np.uint32)
+    return key
+#%%
+keygenfuncvalues=gen_keys(num_of_pixels,num_bits)
+unique_keys_generated, counts_for_each_key = np.unique(keygenfuncvalues, return_counts=True)
+most_common_key =unique_keys_generated[counts_for_each_key.argmax()]
+
+#%%
 min_entropy_simulated_based_on_biased_bits = estimate_min_entropy(num_of_pixels, counts_for_each_key)
 
